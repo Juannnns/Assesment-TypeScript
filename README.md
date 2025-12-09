@@ -53,18 +53,10 @@ The application is fully functional with:
 
 ## Environment Variables
 ### Required for MySQL:
-- `MYSQL_HOST` - MySQL server host
-- `MYSQL_PORT` - MySQL port (default: 3306)
-- `MYSQL_DATABASE` - Database name
-- `MYSQL_USER` - Database user
-- `MYSQL_PASSWORD` - Database password
+DATABASE_URL=mysql://miusuario:micontraseña@localhost:3306/midatabase
+NODE_ENV=development
+PORT=5000
 
-### Required for Email (optional):
-- `SMTP_HOST` - SMTP server host
-- `SMTP_PORT` - SMTP port
-- `SMTP_USER` - SMTP username
-- `SMTP_PASS` - SMTP password
-- `SMTP_FROM` - From email address
 
 ### Other:
 - `SESSION_SECRET` - JWT secret key
