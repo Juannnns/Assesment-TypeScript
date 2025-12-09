@@ -1,38 +1,33 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
+// Storage interface - now using Sequelize with MySQL
+// This file is kept for compatibility but the actual storage
+// is handled by Sequelize models in server/models/
 
-// modify the interface with any CRUD methods
-// you might need
+import { User, Ticket, Comment } from "./models";
+import type { InsertUser } from "../shared/schema";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getUser(id: string): Promise<any | undefined>;
+  getUserByUsername(username: string): Promise<any | undefined>;
+  getUserByEmail(email: string): Promise<any | undefined>;
+  createUser(user: InsertUser): Promise<any>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string) {
+    return User.findByPk(id);
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getUserByUsername(username: string) {
+    return User.findOne({ where: { username } });
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async getUserByEmail(email: string) {
+    return User.findOne({ where: { email } });
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async createUser(insertUser: InsertUser) {
+    return User.create(insertUser);
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
