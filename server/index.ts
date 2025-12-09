@@ -4,6 +4,22 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import { initDatabase } from "./config/database";
 import { startCronJobs } from "./services/cronService";
+import path from "path";
+import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
+
+// Extend Express Request interface to include session
+declare module "express-serve-static-core" {
+  interface Request {
+    session?: {
+      user?: {
+        username: string;
+        role: string;
+      };
+      [key: string]: any;
+    };
+  }
+}
 
 const app = express();
 const httpServer = createServer(app);
@@ -59,6 +75,101 @@ app.use((req, res, next) => {
   });
 
   next();
+});
+
+const PgSession = connectPgSimple(session);
+
+app.use(
+  session({
+    store: new PgSession({
+      conString: process.env.DATABASE_URL, 
+    }),
+    secret: "your-secret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production", 
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, 
+    },
+  })
+);
+
+const defaultAccounts = [
+  {
+    username: "client_user",
+    password: "client_password", 
+    role: "client",
+  },
+  {
+    username: "agent_user",
+    password: "agent_password", 
+    role: "agent",
+  },
+];
+
+
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  const account = defaultAccounts.find(
+    (acc) => acc.username === username && acc.password === password
+  );
+
+  if (!account) {
+    return res.status(401).json({ message: "Credenciales inválidas" });
+  }
+
+  if (req.session) {
+    req.session.user = { username: account.username, role: account.role };
+  }
+
+
+  if (account.role === "client") {
+    return res.json({ message: "Inicio de sesión exitoso", redirect: "/ClientDashboard" });
+  } else if (account.role === "agent") {
+    return res.json({ message: "Inicio de sesión exitoso", redirect: "/AgentDashboard" });
+  }
+});
+
+function isAuthenticated(req: Request, res: Response, next: NextFunction) {
+  if (!req.session?.user) {
+    return res.status(401).json({ message: "No estás autenticado" });
+  }
+  next();
+}
+
+app.get("/session", (req, res) => {
+  if (req.session?.user) {
+    return res.json({ user: req.session.user });
+  }
+  res.status(401).json({ message: "No estás autenticado" });
+});
+
+function authorizeRole(role: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (req.session?.user?.role !== role) {
+      return res.status(403).json({ message: "Acceso denegado" });
+    }
+    next();
+  };
+}
+
+app.get("/client-view", authorizeRole("client"), (req, res) => {
+  res.sendFile(path.join(__dirname, "client-view.html"));
+});
+
+app.get("/agent-view", authorizeRole("agent"), (req, res) => {
+  res.sendFile(path.join(__dirname, "agent-view.html"));
+});
+
+
+app.get("/ClientDashboard", isAuthenticated, authorizeRole("client"), (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/src/pages/ClientDashboard.html"));
+});
+
+
+app.get("/AgentDashboard", isAuthenticated, authorizeRole("agent"), (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/src/pages/AgentDashboard.html"));
 });
 
 (async () => {

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { ticketService, commentService, userService } from "@/lib/services";
 import { insertCommentSchema, type Ticket, type Comment, type User, type InsertComment } from "@shared/schema";

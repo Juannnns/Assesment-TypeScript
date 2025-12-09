@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { loginSchema, insertUserSchema, type LoginCredentials, type InsertUser } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -182,7 +181,7 @@ export default function Login() {
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="John Doe"
+                            placeholder="Moises Smith"
                             data-testid="input-register-name"
                             {...field}
                           />
@@ -199,7 +198,7 @@ export default function Login() {
                         <FormLabel>Username</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="johndoe"
+                            placeholder="moismith"
                             data-testid="input-register-username"
                             {...field}
                           />

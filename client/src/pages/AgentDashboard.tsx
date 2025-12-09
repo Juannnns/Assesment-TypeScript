@@ -5,11 +5,10 @@ import { Navigation } from "@/components/Navigation";
 import { TicketCard } from "@/components/TicketCard";
 import { TicketStats } from "@/components/TicketStats";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import type { Ticket, TicketStatus, TicketPriority } from "@shared/schema";
-import { Filter, RefreshCw, Inbox } from "lucide-react";
+import { RefreshCw, Inbox } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
