@@ -35,7 +35,6 @@ The application is fully functional with:
 │   ├── services/         # Email and cron services
 │   └── routes.ts         # API endpoints
 ├── shared/               # Shared TypeScript types and schemas
-└── design_guidelines.md  # UI/UX design specifications
 ```
 
 ## API Endpoints
